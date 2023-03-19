@@ -38,7 +38,7 @@ exports.signup = (req,res) => {
         user.profile_pic = req.files.pp[0].filename;
     }
     else{
-        user.profile_pic = user.gender == "Female" ? "default_female_pp.png":"default_male_pp"
+        user.profile_pic = user.gender == "Female" ? "default_female_pp.png":"default_male_pp.png"
     }
    
     user.save((err, user) => {
@@ -78,7 +78,7 @@ exports.signup = (req,res) => {
 
 exports.signin = (req,res) => {
     const { username, password } = req.body;
-    
+    console.log(req.body)
     User.findOne(
         {$or:[
             {email: username},

@@ -9,10 +9,7 @@ const {check} = require("express-validator")
 const {isSignedIn, isAdmin, isAuthenticated} = require("../controllers/authentication")
 
 const {
-    getUserById, getUserFeedBacks,getUserRides, getUser, 
-    updateUser,writeFeedback,getUserPayments, addVehicle,
-    verifyUser, showPendingVerifications,getUserVehicles,
-    checkUsernameAndEmail, changePassword
+    getUserById, getUserFeedBacks, getUser, addBaby, addVaccination, getBabyById, getUserBabies, addDoctor
 } = require("../controllers/user");
 
 
@@ -28,100 +25,139 @@ const upload = multer({storage: fileStorageEngine})
 
 // PARAMs
 router.param("userId", getUserById)
-
+router.param("babyId", getBabyById)
 
 // GET
-router.get("/user/:userId/:findUser", isSignedIn, isAuthenticated, getUser);
+router.get("/user/:findUser",  getUser);
 router.get("/feedbacks/user/:userId", getUserFeedBacks);
-router.get("/rides/user/:userId",getUserRides);
-router.get("/payments/user/:userId", getUserPayments)
-router.get("/vehicles/user/:userId", isSignedIn, isAuthenticated, getUserVehicles)
+router.get("/:userId/getBabies", getUserBabies)
+// router.get("/rides/user/:userId",getUserRides);
+// router.get("/payments/user/:userId", getUserPayments)
+// router.get("/vehicles/user/:userId", isSignedIn, isAuthenticated, getUserVehicles)
 
 // PUT
-router.put("/user/:userId", isSignedIn, isAuthenticated,updateUser);
-router.put("/:userId/changePassword", changePassword)
+// router.put("/user/:userId", isSignedIn, isAuthenticated,updateUser);
+// router.put("/:userId/changePassword", changePassword)
 
 
 // POST
-router.post("/writeFeedback/:feedbacker/:feedbackReceiver",  writeFeedback)
-
-router.post("/addVehicle/user/:userId",upload.fields([{
-    name: "license", maxCount:1
-},{
-    name: "vehicleInsurance", maxCount: 1
-},{
-    name: "vehicleRC", maxCount: 1
+router.post("/addBaby/:userId", upload.fields([{
+    name: 'pp', maxCount: 1
 }]), [
-    check("model")
+    check("name")
+    .isLength({min:3})
+    .withMessage("Name should be atleast 3 characters")
+    .isAlpha()
+    .withMessage("Name should not contain any numbers"),
+
+    check("gender")
     .isLength({min: 1})
-    .withMessage("Please provide model name"),
+    .withMessage("Gender is Required"),
 
-    check("namePlate")
-    .isAlphanumeric()
-    .withMessage("Enter valid nameplate number"),
-
-    check("numberOfSeats")
+    check("height")
     .isLength({min: 1})
-    .withMessage("Number of seats can't be empty")
+    .withMessage("Please enter height"),
 
-],addVehicle) 
+    check("weight")
+    .isLength({min: 1})
+    .withMessage("Please enter weight"),
 
-router.post("/checkUsernameAndEmail", checkUsernameAndEmail )
+    check("dob")
+    .isLength({min: 1})
+    .withMessage("Please specify date of birth")
+],addBaby)
+router.post("/addVaccine/:babyId", addVaccination)
+router.post("/addDoctor/:babyId", [
+    check('name')
+    .isLength({min: 3})
+    .withMessage("Name should be atleast 3 characters long")
+    ,
 
-//Admin
-router.get("/pendingUserVerifications/:userId", isSignedIn, isAuthenticated, isAdmin, showPendingVerifications)
-router.put("/verify-user/:userId", isSignedIn, isAuthenticated, isAdmin, verifyUser);
+    check("gender")
+    .isLength({min: 1})
+    .withMessage("Gender is required")
+
+], addDoctor)
+
+// router.post("/writeFeedback/:feedbacker/:feedbackReceiver",  writeFeedback)
+
+// router.post("/addVehicle/user/:userId",upload.fields([{
+//     name: "license", maxCount:1
+// },{
+//     name: "vehicleInsurance", maxCount: 1
+// },{
+//     name: "vehicleRC", maxCount: 1
+// }]), [
+//     check("model")
+//     .isLength({min: 1})
+//     .withMessage("Please provide model name"),
+
+//     check("namePlate")
+//     .isAlphanumeric()
+//     .withMessage("Enter valid nameplate number"),
+
+//     check("numberOfSeats")
+//     .isLength({min: 1})
+//     .withMessage("Number of seats can't be empty")
+
+// ],addVehicle) 
+
+// router.post("/checkUsernameAndEmail", checkUsernameAndEmail )
+
+// //Admin
+// router.get("/pendingUserVerifications/:userId", isSignedIn, isAuthenticated, isAdmin, showPendingVerifications)
+// router.put("/verify-user/:userId", isSignedIn, isAuthenticated, isAdmin, verifyUser);
 
 
 
-const transport = {
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // use TLS
-    auth: {
-        user: process.env.SMTP_TO_EMAIL,
-        pass: process.env.SMTP_TO_PASSWORD,
-    },
-    }
+// const transport = {
+//     host: 'smtp.gmail.com',
+//     port: 465,
+//     secure: true, // use TLS
+//     auth: {
+//         user: process.env.SMTP_TO_EMAIL,
+//         pass: process.env.SMTP_TO_PASSWORD,
+//     },
+//     }
 
-const transporter = nodemailer.createTransport(transport)
+// const transporter = nodemailer.createTransport(transport)
 
-transporter.verify((error, success) => {
-    if (error) {
-        //if error happened code ends here
-        console.error(error)
-    } else {
-        //this means success
-        console.log('Ready to send mail!')
-    }
-})
+// transporter.verify((error, success) => {
+//     if (error) {
+//         //if error happened code ends here
+//         console.error(error)
+//     } else {
+//         //this means success
+//         console.log('Ready to send mail!')
+//     }
+// })
 
 
-router.post('/send-mail', (req, res) => {
-        //make mailable object
-        const mail = {
-        from: process.env.SMTP_FROM_EMAIL,
-        to: process.env.SMTP_TO_EMAIL,
-        subject: 'New Contact Form Submission',
-        text: `
-          from:
-          ${req.body.email}
+// router.post('/send-mail', (req, res) => {
+//         //make mailable object
+//         const mail = {
+//         from: process.env.SMTP_FROM_EMAIL,
+//         to: process.env.SMTP_TO_EMAIL,
+//         subject: 'New Contact Form Submission',
+//         text: `
+//           from:
+//           ${req.body.email}
     
-          message:
-          ${req.body.message}`,
-        }
-        transporter.sendMail(mail, (err, data) => {
-            if (err) {
-                return res.status(400).json({
-                    error: 'Failed to send mail',
-                })
-            } else {
-                return res.json({
-                    status: 'success',
-                })
-            }
-        })
-    })
+//           message:
+//           ${req.body.message}`,
+//         }
+//         transporter.sendMail(mail, (err, data) => {
+//             if (err) {
+//                 return res.status(400).json({
+//                     error: 'Failed to send mail',
+//                 })
+//             } else {
+//                 return res.json({
+//                     status: 'success',
+//                 })
+//             }
+//         })
+//     })
     
 
 module.exports = router;

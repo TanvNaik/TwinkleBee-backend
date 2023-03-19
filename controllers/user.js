@@ -2,10 +2,12 @@ const User = require("../models/user")
 const Feedback = require("../models/feedback")
 const Invoice = require("../models/invoice")
 const Baby = require("../models/baby")
-const Booking = require("../models/booking")
+const Booking = require("../models/bookings")
 
 const { validationResult } = require('express-validator');
-const crypto = require("crypto");
+
+const baby = require("../models/baby")
+const Doctor = require("../models/doctor")
 
 
 
@@ -18,6 +20,20 @@ exports.getUserById = (req,res, next, id)=>{
             });
         }
         req.profile = user;
+        next();
+    })
+}
+
+exports.getBabyById = (req,res,next,id) => {
+    console.log((req.body))
+    
+    Baby.findById(id).exec((err,baby)=>{
+        if(err || !baby){
+            return res.status(400).json({
+                error: "No baby was found in DB"
+            });
+        }
+        req.baby = baby;
         next();
     })
 }
@@ -45,6 +61,7 @@ exports.getUser = (req,res)=>{
 
 exports.addBaby = (req,res)=>{
 
+
     const errors = validationResult(req);
     console.log(errors.errors)
     // checking for validation errors
@@ -56,10 +73,15 @@ exports.addBaby = (req,res)=>{
     
     
     const baby = new Baby(req.body);
-    baby.parentId = req.profile._id;
-    
+    baby.parent = req.profile._id;
+    if(req.files.pp){
+        baby.profile_pic = req.files.pp[0].filename;
+    }
+    else{
+        baby.profile_pic = baby.gender == "Female" ? "default-female-baby.svg":"default-male-baby.svg"
+    }
 
-    baby.save((error, vehicle)=>{
+    baby.save((error, baby)=>{
         if(error){
             return res.status(400).json({
                 error: [{
@@ -86,12 +108,81 @@ exports.addBaby = (req,res)=>{
                 })
             }
             return res.json({
+                babyId: baby._id,
                 message: "Baby's details added successfully"
             })  
         })
     })
 }
+exports.addVaccination = (req,res) => {
+    console.log(req)
+    Baby.findByIdAndUpdate(req.baby._id,{
+        $push: {
+            "vaccination": req.body
+        }
+    },
+    {new: true, useFindAndModify: false },
+    (error, baby)=>{
+        if(error){
+            return res.status(400).json({
+                error: [{
+                    param: "general",
+                    msg:"Unable to add vacccine details for the baby"
+                }]
+            })
+        }
+        return res.json({
+            message: "Vaccine details added successfully"
+        })  
+    })
 
+}
+
+exports.addDoctor= (req,res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(422).json({
+            error: errors.errors,
+        })//422- Unprocessable entity
+    }
+    
+    
+    const doctor = new Doctor(req.body);
+    
+    
+    doctor.save((error, doctor)=>{
+        if(error){
+            return res.status(400).json({
+                error: [{
+                    param: "general",
+                    msg:"Unable to save doctor details"
+                }]
+            })
+        }
+        req.doctor = doctor;
+
+        Baby.findByIdAndUpdate(req.baby._id,{
+            $push: {
+                "doctor": doctor._id
+            }
+        },
+        {new: true, useFindAndModify: false },
+        (error, user)=>{
+            if(error){
+                return res.status(400).json({
+                    error: [{
+                        param: "general",
+                        msg:"Unable to add doctor details in baby's profile"
+                    }]
+                })
+            }
+            return res.json({
+                doctor: doctor._id,
+                message: "Doctor's details added successfully"
+            })  
+        })
+    })
+}
 exports.checkUsernameAndEmail = (req,res) => {
 
     User.find({'username': req.body.username, 'email': req.body.email})
@@ -113,7 +204,7 @@ exports.getUserBabies = (req, res) => {
 
     Baby.find({parentId: req.profile._id})
     .exec((err, babies) => {
-        if(err || vehicles.length == 0){
+        if(err || babies.length == 0){
             return res.status(400).json({
                 error: "No Babies found"
             })
@@ -228,7 +319,6 @@ exports.showPendingVerifications = (req,res) =>{
 }
 // FEEDBACKS
 exports.getUserFeedBacks = (req,res)=>{
-    
     Feedback.find({
         "_id": {
             $in: req.profile.feedbacks
@@ -239,6 +329,8 @@ exports.getUserFeedBacks = (req,res)=>{
                 error: "Cannot find Feedbacks"
             })
         }
+        
+        
         return res.json({
             feedbacks: feedbacks
         })
