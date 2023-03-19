@@ -8,14 +8,14 @@ const bookingSchema = mongoose.Schema({
     },
     babyId: {
         type: mongoose.Schema.ObjectId,
-        ref: "User"
+        ref: "Baby"
     },
     //weekly, monthly, yearly
     duration: {
         type: String
     },
     //hours per day
-    hours:{
+    hoursperday:{
         type: String
     },
     fees: {
@@ -24,6 +24,10 @@ const bookingSchema = mongoose.Schema({
     invoiceId:{
         type: mongoose.Schema.ObjectId,
         ref: "Invoice",
+    },
+    status:{
+        type: String,
+        default: 'Pending'
     },
     paymentStatus: {
         type: Boolean,

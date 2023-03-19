@@ -4,10 +4,13 @@
 // updatePaymentInBooking
 
 const { validationResult } = require("express-validator");
+
 const Booking = require("../models/bookings");
 const User = require("../models/user");
 
 exports.getBookingById = (req, res, next, id) => {
+    console.log("Profile" + req.profile)
+    
     Booking.findById(id)
     .populate('parentId babyId invoiceId').exec((error, booking) => {
         if(error || !booking){
@@ -29,16 +32,16 @@ exports.getAllBookings= (req,res) =>{
 
     Booking.find()
     .sort([[sortBy, 'descending']])
-    .populate('parentId')
-    .limit(limit)
-    .exec((err, rides) => {
+    .populate('parentId babyId')
+    // .limit(limit)
+    .exec((err, bookings) => {
         if(err){
             return res.status(400).json({
-                error: "No rides found"
+                error: "No bookings found"
             })
         }
         return res.json({
-            rides: rides
+            bookings: bookings
         })
     })
 }
@@ -93,4 +96,48 @@ exports.createBooking = (req,res)=>{
             })  
         })
     })
+}
+
+exports.approveBooking = (req,res) => {
+    console.log("BOoking" +req.booking)
+    Booking.findByIdAndUpdate(req.booking._id,
+        {
+            status : 'Approved'
+        },
+        {new: true, useFindAndModify: false },
+        (error,booking) => {
+            if(error){
+                return res.status(400).json({
+                    error: [{
+                        param: "general",
+                        msg:"Something went wrong. Please try again"
+                    }]
+                })
+            }
+            return res.json({
+                booking: booking,
+                message: "Booking approved successfully"
+            })  
+        })
+}
+exports.rejectBooking = (req,res) => {
+    Booking.findByIdAndUpdate(req.booking._id,
+        {
+            status : 'Rejected'
+        },
+        {new: true, useFindAndModify: false },
+        (error,booking) => {
+            if(error){
+                return res.status(400).json({
+                    error: [{
+                        param: "general",
+                        msg:"Something went wrong. Please try again"
+                    }]
+                })
+            }
+            return res.json({
+                booking: booking,
+                message: "Booking rejected successfully"
+            })  
+        })
 }

@@ -10,7 +10,7 @@ const path = require("path");
 // Routes
 const authenticateRoute = require("./routes/authentication");
 const userRoute = require("./routes/user");
-// const rideRoute = require("./routes/ride");
+const bookingRoute = require("./routes/booking");
 // const invoiceRoute = require("./routes/invoice");
 // const stripeRoutes = require("./routes/stripePayment");
 // const conversationRoutes = require("./routes/conversation");
@@ -42,7 +42,7 @@ app.use("/image", cors(),express.static(path.join(__dirname, '/uploads/images'))
 // Routes
 app.use("/api", authenticateRoute);
 app.use("/api", userRoute);
-// app.use("/api", rideRoute);
+app.use("/api", bookingRoute);
 // app.use("/api", invoiceRoute);
 // app.use("/api", stripeRoutes);
 // app.use("/api", conversationRoutes);
