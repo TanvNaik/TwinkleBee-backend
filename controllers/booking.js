@@ -9,10 +9,9 @@ const Booking = require("../models/bookings");
 const User = require("../models/user");
 
 exports.getBookingById = (req, res, next, id) => {
-    console.log("Profile" + req.profile)
     
     Booking.findById(id)
-    .populate('parentId babyId invoiceId').exec((error, booking) => {
+    .populate('parentId babyId invoiceId babysitter').exec((error, booking) => {
         if(error || !booking){
             return res.status(400).json({
                 error: "Unable to find Booking"
@@ -32,7 +31,7 @@ exports.getAllBookings= (req,res) =>{
 
     Booking.find()
     .sort([[sortBy, 'descending']])
-    .populate('parentId babyId')
+    .populate('parentId babyId babysitter')
     // .limit(limit)
     .exec((err, bookings) => {
         if(err){
@@ -99,7 +98,7 @@ exports.createBooking = (req,res)=>{
 }
 
 exports.approveBooking = (req,res) => {
-    console.log("BOoking" +req.booking)
+
     Booking.findByIdAndUpdate(req.booking._id,
         {
             status : 'Approved'
@@ -139,5 +138,25 @@ exports.rejectBooking = (req,res) => {
                 booking: booking,
                 message: "Booking rejected successfully"
             })  
+        })
+}
+exports.updatePaymentInBooking = (req,res,next) => {
+
+    Booking.findByIdAndUpdate(req.params.bookingId,
+        {
+            invoiceId : res.locals.invoice._id,
+            paymentStatus: true
+        },
+        {new: true, useFindAndModify: false },
+        (error,booking) => {
+            if(error){
+                return res.status(400).json({
+                    error: [{
+                        param: "general",
+                        msg:"Something went wrong. Please try again"
+                    }]
+                })
+            }
+            next()
         })
 }

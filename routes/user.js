@@ -9,7 +9,7 @@ const {check} = require("express-validator")
 const {isSignedIn, isAdmin, isAuthenticated} = require("../controllers/authentication")
 
 const {
-    getUserById, getUserFeedBacks, getUser, addBaby, addVaccination, getBabyById, getUserBabies, addDoctor
+    getUserById, getUserFeedBacks, getUser, addBaby, addVaccination, getBabyById, getUserBabies, addDoctor, getBaby, getAllBabysitters, verifyBabySitter, deleteBabysitter, getUserBookings, assignBabysitter, writeFeedback
 } = require("../controllers/user");
 
 
@@ -29,8 +29,12 @@ router.param("babyId", getBabyById)
 
 // GET
 router.get("/user/:findUser",  getUser);
+router.get("/baby/:findBaby", getBaby);
+router.get('/babysitters', getAllBabysitters)
 router.get("/feedbacks/user/:userId", getUserFeedBacks);
 router.get("/:userId/getBabies", getUserBabies)
+router.get("/:userId/getbookings", getUserBookings);
+
 // router.get("/rides/user/:userId",getUserRides);
 // router.get("/payments/user/:userId", getUserPayments)
 // router.get("/vehicles/user/:userId", isSignedIn, isAuthenticated, getUserVehicles)
@@ -78,8 +82,19 @@ router.post("/addDoctor/:babyId", [
     .withMessage("Gender is required")
 
 ], addDoctor)
+router.post("/assign/:babysitterId/:bookingId", assignBabysitter)
+router.post("/writeFeedback/:feedbacker/:feedbackReceiver",  writeFeedback)
 
-// router.post("/writeFeedback/:feedbacker/:feedbackReceiver",  writeFeedback)
+
+// PUT
+router.put("/verify/:userId/:babysitterId", isAdmin, verifyBabySitter)
+
+
+// DELETE 
+router.delete("/delete/:userId/:babysitterId", isAdmin, deleteBabysitter)
+
+
+
 
 // router.post("/addVehicle/user/:userId",upload.fields([{
 //     name: "license", maxCount:1

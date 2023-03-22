@@ -3,10 +3,9 @@ const Feedback = require("../models/feedback")
 const Invoice = require("../models/invoice")
 const Baby = require("../models/baby")
 const Booking = require("../models/bookings")
-
 const { validationResult } = require('express-validator');
 
-const baby = require("../models/baby")
+
 const Doctor = require("../models/doctor")
 
 
@@ -25,9 +24,10 @@ exports.getUserById = (req,res, next, id)=>{
 }
 
 exports.getBabyById = (req,res,next,id) => {
-    console.log((req.body))
     
-    Baby.findById(id).exec((err,baby)=>{
+    Baby.findById(id)
+    
+    .exec((err,baby)=>{
         if(err || !baby){
             return res.status(400).json({
                 error: "No baby was found in DB"
@@ -37,6 +37,23 @@ exports.getBabyById = (req,res,next,id) => {
         next();
     })
 }
+
+exports.getBaby = (req,res) => {
+    Baby.findById(req.params.findBaby)
+    .populate('parent babysitter doctors')
+    .exec((err,baby)=>{
+        if(err || !baby){
+            return res.status(400).json({
+                error: "No baby was found in DB"
+            });
+        }
+        req.baby = baby
+        return res.json({
+            baby: req.baby
+        });    
+    })
+}
+
 exports.getUser = (req,res)=>{
 
     User.findById(req.params.findUser).exec((err,user)=>{
@@ -127,7 +144,7 @@ exports.addVaccination = (req,res) => {
             return res.status(400).json({
                 error: [{
                     param: "general",
-                    msg:"Unable to add vacccine details for the baby"
+                    msg:"Unable to add Vaccine details"
                 }]
             })
         }
@@ -160,14 +177,15 @@ exports.addDoctor= (req,res) => {
             })
         }
         req.doctor = doctor;
+        console.log(req.doctor.contact)
 
         Baby.findByIdAndUpdate(req.baby._id,{
             $push: {
-                "doctor": doctor._id
+                "doctors": doctor._id
             }
         },
         {new: true, useFindAndModify: false },
-        (error, user)=>{
+        (error, baby)=>{
             if(error){
                 return res.status(400).json({
                     error: [{
@@ -176,6 +194,7 @@ exports.addDoctor= (req,res) => {
                     }]
                 })
             }
+
             return res.json({
                 doctor: doctor._id,
                 message: "Doctor's details added successfully"
@@ -215,30 +234,76 @@ exports.getUserBabies = (req, res) => {
     })
 
 }
-
-exports.verifyBabySitter = (req,res) =>{
-    const userId = req.body.userId;
-    
-    User.findByIdAndUpdate(userId, {verificationStatus: true}, {new: true}, (err, user) =>{
+// BABYSITTERS
+exports.getAllBabysitters = (req,res) => {
+    let sortBy = req.query.sortBy ? req.query.sortBy : "createdAt";
+    User.find()
+    .where('role')
+    .equals('1')
+    .sort([[sortBy, 'descending']])
+    .exec((err, babysitters) => {
         if(err){
             return res.status(400).json({
-                error: "Unable to verify the user"
+                error: "No babysitters found"
+            })
+        }
+        return res.json({
+            babysitters: babysitters
+        })
+    })
+}
+
+exports.assignBabysitter = (req,res) =>{
+    const userId = req.params.babysitterId;
+    const bookingId = req.params.bookingId;
+    Booking.findByIdAndUpdate(bookingId, {babysitter: userId, babysitterAssigned: true}, {new: true}, (err, user) =>{
+        if(err){
+            return res.status(400).json({
+                error: "Unable to assign the Babysitter"
             })
         }
         else{
             return res.status(200).json({
-                message: "User Verified Succesfully"
+                message: "Babysitter assigned Succesfully"
             })
         }
     })  
 }
 
+exports.verifyBabySitter = (req,res) =>{
+    const userId = req.params.babysitterId;
+    
+    User.findByIdAndUpdate(userId, {verificationStatus: true}, {new: true}, (err, user) =>{
+        if(err){
+            return res.status(400).json({
+                error: "Unable to verify the Babysitter"
+            })
+        }
+        else{
+            return res.status(200).json({
+                message: "Babysitter Verified Succesfully"
+            })
+        }
+    })  
+}
+exports.deleteBabysitter = (req, res) => {
+    const userId = req.params.babysitterId;
+    User.deleteOne({_id:userId})
+  .then(result=>{
+    return res.json({
+        message: "Babysitter Deleted Successfully"
+    })
+    })   
+}
+
+
+
 exports.getUserBookings = (req,res)=>{
     Booking.find({"parentId": req.profile._id})
-    .populate('invoiceId babyId parentId').exec((err, bookings)=>{
+    .populate('invoiceId babyId parentId babysitter').exec((err, bookings)=>{
         if(err || !bookings){
             return res.json({
-                error: "No Rides Found"
+                error: "No bookings Found"
             })
         }
         return res.json({
@@ -373,18 +438,18 @@ exports.writeFeedback = (req,res)=>{
 }
 
 exports.updatePaymentInUser = (req,res) => {
-    User.findByIdAndUpdate(req.body.sender, 
+    User.findByIdAndUpdate(req.body.parent, 
         {"$push" : { "payments": res.locals.invoice._id}},
         {new: true, useFindAndModify: false },
         (err, user)=>{
             if(err){
                 return res.status(400).json({
-                    error: "Unable to update payment to sender"
+                    error: "Unable to update payment in Parent's profile"
                 })
             }
             return res.json({
                         invoice: res.locals.invoice,
-                        ride: res.locals.ride
+                        
                     })
             
         }

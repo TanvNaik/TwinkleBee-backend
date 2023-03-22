@@ -66,11 +66,12 @@ const userSchema = new mongoose.Schema({
       type: [mongoose.Schema.ObjectId], 
       ref: 'Booking', 
       default:[]
-    }   ,
+    },
     verificationStatus: {
       type: Boolean,
       default: false
-    }
+    },
+    
 },{timestamps: true});
 
 userSchema

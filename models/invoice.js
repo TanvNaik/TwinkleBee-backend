@@ -1,16 +1,19 @@
-//DONE
 const mongoose = require("mongoose");
 
 
 const invoiceSchema = mongoose.Schema({
-    invoiceAmount: Number,
-    babyId:{
+    parent: {
         type: mongoose.Schema.ObjectId, 
         ref: 'User', 
     },
+    invoiceAmount: Number,
+    babyId:{
+        type: mongoose.Schema.ObjectId, 
+        ref: 'Baby', 
+    },
     bookingId:{
         type: mongoose.Schema.ObjectId, 
-      ref: 'Booking', 
+        ref: 'Booking', 
 
     }
 

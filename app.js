@@ -11,9 +11,9 @@ const path = require("path");
 const authenticateRoute = require("./routes/authentication");
 const userRoute = require("./routes/user");
 const bookingRoute = require("./routes/booking");
-// const invoiceRoute = require("./routes/invoice");
-// const stripeRoutes = require("./routes/stripePayment");
-// const conversationRoutes = require("./routes/conversation");
+const invoiceRoute = require("./routes/invoice");
+const stripeRoutes = require("./routes/stripePayment");
+const conversationRoutes = require("./routes/conversation");
 
 // PORT
  const port = process.env.PORT || 3000;
@@ -36,16 +36,19 @@ mongoose
 // Middlewares
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+  origin : "http://localhost:3000",
+  credentials: true, // <= Accept credentials (cookies) sent by the client
+}));
 app.use("/image", cors(),express.static(path.join(__dirname, '/uploads/images')))
 
 // Routes
 app.use("/api", authenticateRoute);
 app.use("/api", userRoute);
 app.use("/api", bookingRoute);
-// app.use("/api", invoiceRoute);
-// app.use("/api", stripeRoutes);
-// app.use("/api", conversationRoutes);
+app.use("/api", invoiceRoute);
+app.use("/api", stripeRoutes);
+app.use("/api", conversationRoutes);
 
 
 

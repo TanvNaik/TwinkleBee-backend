@@ -9,9 +9,11 @@ const doctorSchema = new mongoose.Schema({
     gender:{
       type: String
     },
-    contact:{
-        type:[],
-        default: []
+    contact1:{
+        type: Number
+    },
+    contact2:{
+        type: Number
     },
     address:{
         type: String

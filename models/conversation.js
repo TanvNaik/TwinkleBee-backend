@@ -1,5 +1,4 @@
-//DONE
-s
+
 const mongoose = require("mongoose");
 
 const conversationSchema = mongoose.Schema({

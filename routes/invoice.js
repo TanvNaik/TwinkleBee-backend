@@ -1,23 +1,27 @@
 const express = require("express");
 const router = express.Router();
+const cors = require('cors');
+
 
 const {
     getInvoiceById,
     addInvoice,
-    getBookingInvoices
+    getBookingInvoice
 } = require("../controllers/invoice")
-const { updatePayemtInRide } = require("../controllers/ride");
-const { updatePaymentInUser } = require("../controllers/user");
+const { updatePaymentInBooking, getBookingById } = require("../controllers/booking");
+const { updatePaymentInUser, getUserById } = require("../controllers/user");
 
 
 // PARAMs
 router.param("/invoiceId", getInvoiceById)
+router.param("/userId", getUserById)
+router.param("/bookingId", getBookingById)
 
 //GET
-router.get("/invoices/:bookingId", getBookingInvoices)
+router.get("/invoices/:bookingId", getBookingInvoice)
 
 // POST
-router.post("/create/invoice/:rideId/:userId",addInvoice,  updatePayemtInRide , updatePaymentInUser );
+router.post("/create/invoice/:bookingId/:userId",addInvoice,  updatePaymentInBooking , updatePaymentInUser );
 
 
 module.exports = router;

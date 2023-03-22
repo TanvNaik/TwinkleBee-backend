@@ -8,7 +8,11 @@ const babySchema = new mongoose.Schema({
     },
     parent: {
         type: mongoose.Schema.ObjectId,
-        ref: "Parent"
+        ref: "User"
+    },
+    babysitter:{
+        type: mongoose.Schema.ObjectId,
+        ref: "User"
     },
     gender:{
       type: String

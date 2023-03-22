@@ -10,6 +10,14 @@ const bookingSchema = mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: "Baby"
     },
+    babysitterAssigned: {
+        type: Boolean ,
+        default: false
+    },
+    babysitter:{
+        type: mongoose.Schema.ObjectId,
+        ref: "User"
+    },
     //weekly, monthly, yearly
     duration: {
         type: String
@@ -33,5 +41,6 @@ const bookingSchema = mongoose.Schema({
         type: Boolean,
         default: false
     }
+
 },{timestamps:true})
 module.exports = mongoose.model("Booking", bookingSchema)
