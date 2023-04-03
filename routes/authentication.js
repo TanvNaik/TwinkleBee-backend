@@ -40,6 +40,10 @@ router.post("/signup",upload.fields([{
     .isLength({min:6})
     .withMessage("Username must be atleast 6 characters"),
 
+    check("adhaarNumber")
+    .isLength({min:12, max:12})
+    .withMessage("Adhaar card number must be 12 digits long"),
+    
     check("email")
     .isEmail()
     .withMessage("Enter valid email-id"),  

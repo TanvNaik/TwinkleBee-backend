@@ -9,7 +9,7 @@ const {check} = require("express-validator")
 const {isSignedIn, isAdmin, isAuthenticated} = require("../controllers/authentication")
 
 const {
-    getUserById, getUserFeedBacks, getUser, addBaby, addVaccination, getBabyById, getUserBabies, addDoctor, getBaby, getAllBabysitters, verifyBabySitter, deleteBabysitter, getUserBookings, assignBabysitter, writeFeedback
+    getUserById, getUserFeedBacks, getUser, addBaby, addVaccination, getBabyById, getUserBabies, addDoctor, getBaby, getAllBabysitters, verifyBabySitter, deleteBabysitter, getUserBookings, assignBabysitter, writeFeedback, getAssignedBookings
 } = require("../controllers/user");
 
 
@@ -34,14 +34,8 @@ router.get('/babysitters', getAllBabysitters)
 router.get("/feedbacks/user/:userId", getUserFeedBacks);
 router.get("/:userId/getBabies", getUserBabies)
 router.get("/:userId/getbookings", getUserBookings);
+router.get("/:userId/get-assigned-bookings", getAssignedBookings);
 
-// router.get("/rides/user/:userId",getUserRides);
-// router.get("/payments/user/:userId", getUserPayments)
-// router.get("/vehicles/user/:userId", isSignedIn, isAuthenticated, getUserVehicles)
-
-// PUT
-// router.put("/user/:userId", isSignedIn, isAuthenticated,updateUser);
-// router.put("/:userId/changePassword", changePassword)
 
 
 // POST
@@ -95,33 +89,6 @@ router.delete("/delete/:userId/:babysitterId", isAdmin, deleteBabysitter)
 
 
 
-
-// router.post("/addVehicle/user/:userId",upload.fields([{
-//     name: "license", maxCount:1
-// },{
-//     name: "vehicleInsurance", maxCount: 1
-// },{
-//     name: "vehicleRC", maxCount: 1
-// }]), [
-//     check("model")
-//     .isLength({min: 1})
-//     .withMessage("Please provide model name"),
-
-//     check("namePlate")
-//     .isAlphanumeric()
-//     .withMessage("Enter valid nameplate number"),
-
-//     check("numberOfSeats")
-//     .isLength({min: 1})
-//     .withMessage("Number of seats can't be empty")
-
-// ],addVehicle) 
-
-// router.post("/checkUsernameAndEmail", checkUsernameAndEmail )
-
-// //Admin
-// router.get("/pendingUserVerifications/:userId", isSignedIn, isAuthenticated, isAdmin, showPendingVerifications)
-// router.put("/verify-user/:userId", isSignedIn, isAuthenticated, isAdmin, verifyUser);
 
 
 

@@ -26,7 +26,6 @@ router.get("/:conversationId", getMessage)
 
 
 // POST
-// in req.body => sender, receiver, content
 router.post("/createMessage", createMessage)
 router.post("/createConversation", createConversation)
 

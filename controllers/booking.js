@@ -1,8 +1,3 @@
-// getBookingById
-// getAllBookings
-// createBooking
-// updatePaymentInBooking
-
 const { validationResult } = require("express-validator");
 
 const Booking = require("../models/bookings");
@@ -56,6 +51,7 @@ exports.createBooking = (req,res)=>{
 
     // checking for validation errors
     if(!errors.isEmpty()){
+        console.log(error)
         return res.status(422).json({
             error: errors.errors
         })//422- Unprocessable entity

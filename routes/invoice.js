@@ -6,7 +6,8 @@ const cors = require('cors');
 const {
     getInvoiceById,
     addInvoice,
-    getBookingInvoice
+    getBookingInvoice,
+    getAllInvoices
 } = require("../controllers/invoice")
 const { updatePaymentInBooking, getBookingById } = require("../controllers/booking");
 const { updatePaymentInUser, getUserById } = require("../controllers/user");
@@ -19,6 +20,7 @@ router.param("/bookingId", getBookingById)
 
 //GET
 router.get("/invoices/:bookingId", getBookingInvoice)
+router.get("/invoices", getAllInvoices)
 
 // POST
 router.post("/create/invoice/:bookingId/:userId",addInvoice,  updatePaymentInBooking , updatePaymentInUser );

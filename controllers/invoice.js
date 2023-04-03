@@ -27,13 +27,25 @@ exports.getBookingInvoice = (req,res) => {
         })
     })
 }
+exports.getAllInvoices = (req,res) => {
+    Invoice.find()
+    .populate("babyId bookingId parent").exec( (err, invoices) => {
+        if(err || !invoices){
+            return res.status(400).json({
+                error: "Unable to find invoice"
+            })
+        }
+        return res.json({
+            invoices: invoices
+        })
+    })
+}
 
 exports.addInvoice = (req,res,next)=>{
-    console.log("iaddinvoice")
     const invoice = new Invoice({
         parent: req.body.parent,
         babyId: req.body.babyId,
-        bookingId: req.body.bookingId,
+        bookingId: req.params.bookingId,
         invoiceAmount: req.body.invoiceAmount
     });
     invoice.save((err,invoice)=>{
@@ -48,3 +60,4 @@ exports.addInvoice = (req,res,next)=>{
         next()       
     })
 }
+

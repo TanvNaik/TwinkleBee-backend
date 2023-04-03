@@ -15,15 +15,7 @@ exports.signup = (req,res) => {
         })//422- Unprocessable entity
     }
 
-    // if(!req.files.document){
-    //     return res.status(422).json({
-    //         error:[{
-    //             param: "document",
-    //             msg: "Document is not Uploaded"
-    //         }] 
-    //     })
-    // }
-    
+      
     if(req.body.cfPassword !== req.body.password){
         return res.status(422).json({
             error: [{

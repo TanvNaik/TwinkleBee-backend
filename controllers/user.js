@@ -303,6 +303,19 @@ exports.getUserBookings = (req,res)=>{
     .populate('invoiceId babyId parentId babysitter').exec((err, bookings)=>{
         if(err || !bookings){
             return res.json({
+                error: "No assigned bookings Found"
+            })
+        }
+        return res.json({
+            bookings: bookings
+        });
+    })
+}
+exports.getAssignedBookings = (req,res)=>{
+    Booking.find({"babysitter": req.profile._id})
+    .populate('invoiceId babyId parentId babysitter').exec((err, bookings)=>{
+        if(err || !bookings){
+            return res.json({
                 error: "No bookings Found"
             })
         }
