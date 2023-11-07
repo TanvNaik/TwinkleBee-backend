@@ -14,6 +14,7 @@ const bookingRoute = require("./routes/booking");
 const invoiceRoute = require("./routes/invoice");
 const stripeRoutes = require("./routes/stripePayment");
 const conversationRoutes = require("./routes/conversation");
+const postRoutes = require("./routes/post")
 
 // PORT
  const port = process.env.PORT || 3000;
@@ -37,10 +38,11 @@ mongoose
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors({
-  origin : "http://localhost:3000",
+  origin : "https://twinklebee.onrender.com",
   credentials: true, // <= Accept credentials (cookies) sent by the client
 }));
 app.use("/image", cors(),express.static(path.join(__dirname, '/uploads/images')))
+app.use("/posts", cors(),express.static(path.join(__dirname, '/uploads/posts')))
 
 // Routes
 app.use("/api", authenticateRoute);
@@ -49,6 +51,7 @@ app.use("/api", bookingRoute);
 app.use("/api", invoiceRoute);
 app.use("/api", stripeRoutes);
 app.use("/api", conversationRoutes);
+app.use("/api", postRoutes);
 
 
 

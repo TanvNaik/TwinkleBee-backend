@@ -55,7 +55,6 @@ exports.addInvoice = (req,res,next)=>{
             })
         }
         res.locals.invoice = invoice
-        console.log("Done in Invoice")
         // push payment in booking             
         next()       
     })

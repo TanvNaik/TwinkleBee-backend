@@ -67,6 +67,11 @@ const userSchema = new mongoose.Schema({
       ref: 'Booking', 
       default:[]
     },
+    posts:{
+      type: [mongoose.Schema.ObjectId], 
+      ref: 'Post', 
+      default:[]
+    },
     verificationStatus: {
       type: Boolean,
       default: false
